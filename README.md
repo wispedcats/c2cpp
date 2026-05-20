@@ -19,3 +19,14 @@ I used AI for guidance learning, but I wrote the code by myself. Nothing here wa
 
 - The implementation and design decisions were developed by me.
 - AI helped only as a reference while I wrote and structured the code.
+
+
+
+
+<details>
+<summary>Updates</summary>
+
+### 0.0.1: Added some comments by AI to improve some understanding. (No code Changes)
+
+
+</details>
