@@ -36,6 +36,10 @@ int main() {
 
     // accept client connection
     int communicationSocket = accept(serverSocket, nullptr, nullptr);
+
+    
+    
+
     if (communicationSocket == -1) {
         std::cerr << "accepting failed" << std::endl;
         close(serverSocket);
@@ -44,24 +48,44 @@ int main() {
 
     std::cout << "client connected successfully!" << std::endl;
 
-    // receive client message
-    char puffer[1024] = {0};
-    recv(communicationSocket, puffer, 1024, 0);
-    std::cout << "message from client: " << puffer << std::endl;
+    struct timeval tv;
+    tv.tv_sec = 5;
+    tv.tv_usec = 0;
 
-    // send reply to client
-    std::string message;
-    std::cin >> message;
+    setsockopt(communicationSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));
 
-    int sendedBytes = send(communicationSocket, message.c_str(), message.length(), 0);
+    while (true) {
+        char puffer[1024] = {0};
 
-    if (sendedBytes == -1) {
-        std::cerr << "error while sending!" << std::endl;
-    } else {
-        std::cout << "success " << sendedBytes << " bytes send" << std::endl;
+        // receive client message 
+        int receivedBytes = recv(communicationSocket, puffer, 1024, 0);
+
+        if (receivedBytes > 0) {
+            std::cout << "Received message: " << puffer << std::endl;
+
+            std::string response = "pong";
+            send(communicationSocket, response.c_str(), response.length(), 0);
+        } else if (receivedBytes == -1) {
+            if (errno == EWOULDBLOCK || errno == EAGAIN) {
+                int check = send(communicationSocket, "ping", 4, 0);
+
+                if (check == -1) {
+                    // if there is no answer we close the socket connection by stopping the loop!
+                    break;
+                }
+            } else {
+                // if something other strange is happening we also disconnect
+                std::cerr << "netowrk error or smth" << std::endl;
+                break;
+            }
+        } else if (receivedBytes == 0){
+            std::cout << "client disconnected :("  << std::endl;
+            break;
+        }
+
     }
 
-    // cleanup sockets
+    // cleanup sockets and this shi
     close(communicationSocket);
     close(serverSocket);
 

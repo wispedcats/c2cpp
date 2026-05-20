@@ -44,22 +44,30 @@ int main() {
         std::cout << "success " << sendedBytes << " bytes send" << std::endl;
     }
 
-    // receive server response
-    char puffer[1024] = {0};
-    int receivedBytes = recv(clientSocket, puffer, 1024, 0);
+    while (true) {
+        char puffer[1024] = {0};
 
-    if (receivedBytes > 0) {
-        std::cout << "server answered: " << puffer << std::endl;
-    } else if (receivedBytes == 0) {
-        std::cout << "server closed the connection." << std::endl;
-    } else {
-        std::cerr << "error while receiving" << std::endl;
+        // waiting until server sents something
+        int receivedBytes = recv(clientSocket, puffer, 1024, 0);
+
+        if (receivedBytes > 0) {
+            std::cout << "received from server: " << puffer << std::endl;
+
+
+            if (std::string(puffer) == "ping") {
+                send(clientSocket, "pong", 4, 0);
+            }
+        } else if (receivedBytes == 0) {
+            std::cout << "server closed connection" << std::endl;
+            break ;
+        } else {
+            std::cerr << "something went wrong lol" << std::endl;
+            break;
+        }
     }
-
-    // close client socket
+    
+    
     close(clientSocket);
-    std::cout << "closed connection" << std::endl;
-
     return 0;
 }
 
