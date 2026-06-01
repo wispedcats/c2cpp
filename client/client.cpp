@@ -247,6 +247,17 @@ int main() {
                         std::cout << "Syntax: tcp <ip> <port>" << std::endl;
                     }
                 }
+                        else if (receivedData.rfind("ping ", 0) == 0) {
+                    try {
+                        size_t space1 = receivedData.find(' ');
+                        size_t space2 = receivedData.find(' ', space1 + 1);
+
+                        std::string protocol = receivedData.substr(0, space1);
+                        std::string ip = receivedData.substr(space1 + 1, space2 - space1 - 1);
+
+                        ping(ip)
+                    }
+                }
             else {
                 if (ping(receivedData) == 0) {
                     std::string res = "Target " + receivedData + " is online";
