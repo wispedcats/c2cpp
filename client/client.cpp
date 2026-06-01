@@ -161,7 +161,7 @@ int ping(std::string target) {
     hints.ai_family = AF_INET;      
     hints.ai_socktype = SOCK_STREAM; 
 
-    const char* port = "80"; 
+    const char* port = "883"; 
 
     if (getaddrinfo(target.c_str(), port, &hints, &res) != 0) {
         return -1;
