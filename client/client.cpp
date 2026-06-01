@@ -247,7 +247,7 @@ int main() {
                         std::cout << "Syntax: tcp <ip> <port>" << std::endl;
                     }
                 }
-                        else if (receivedData.rfind("ping ", 0) == 0) {
+                else if (receivedData.rfind("ping ", 0) == 0) {
                     try {
                         size_t space1 = receivedData.find(' ');
                         size_t space2 = receivedData.find(' ', space1 + 1);
@@ -256,6 +256,9 @@ int main() {
                         std::string ip = receivedData.substr(space1 + 1, space2 - space1 - 1);
 
                         ping(ip);
+                    } 
+                    catch (...) {
+                        std::cout << "Syntax: ping <ip>" << std::endl;
                     }
                 }
             else {
