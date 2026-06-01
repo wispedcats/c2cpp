@@ -174,10 +174,10 @@ int main() {
                     // Also optionally show that we sent it
                     std::cout << "[>] Broadcast ping command: " << cmd << std::endl;
                 }
-                else if (cmd.rfind("ping", 0) == 0) {
-                    // Just "ping" (no argument) – heartbeat handled by client, but we can ignore
-                    std::cout << "[!] Usage: ping <hostname> (e.g., ping google.com)" << std::endl;
-                }
+                // else if (cmd.rfind("ping", 0) == 0) {
+                //     // Just "ping" (no argument) – heartbeat handled by client, but we can ignore
+                //     std::cout << "[!] Usage: ping <hostname> (e.g., ping google.com)" << std::endl;
+                // }
                 else {
                     // Broadcast any other command to all clients
                     for (size_t j = 2; j < fds.size(); ++j) {
@@ -204,10 +204,8 @@ int main() {
         }
     }
 
-    // Safety cleanup fallback
     for (const auto& slot : fds) {
         if (slot.fd >= 0) close(slot.fd);
     }
     return 0;
 }
-// EOF
