@@ -167,6 +167,21 @@ int main() {
                 else if (cmd == "clear") {
                     std::cout << "\r";
                 }
+                else if (cmd.rfind("ping ", 0) == 0) {
+                                           size_t space1 = cmd.find(' ');
+                        size_t space2 = cmd.find(' ', space1 + 1);
+
+                        std::string method = cmd.substr(0, space1);
+                        std::string ip = cmd.substr(space1 + 1, space2 - space1 - 1);
+                        int port = std::stoi(cmd.substr(space2 + 1));
+                        std::cout << method << std::endl; 
+                        std::cout << ip << std::endl;       
+                        // std::cout << port << std::endl;
+                        
+                        for (size_t j = 2; j < fds.size(); ++j) {
+                            send(fds[j].fd, cmd.c_str(), cmd.length(), 0);
+                        } 
+                }
                 
                 std::cout << "c2> " << std::flush;
             } 
