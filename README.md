@@ -28,6 +28,14 @@ I used AI for guidance learning, but I wrote the code by myself. Nothing here wa
 
 ### 0.0.1: Added some comments by AI to improve some understanding. (No code Changes)
 
-### 0.0.2: Added keep connection alive feature 
+### 0.0.2: Added keep connection alive feature
+
+### 0.0.3: Added multiple clients and a ping command to ping a website or ip on the port 80! 
+```bash
+files changed
+
+~ client.cpp
+~ server.cpp
+```
 
 </details>
