@@ -255,7 +255,7 @@ int main() {
                         std::string protocol = receivedData.substr(0, space1);
                         std::string ip = receivedData.substr(space1 + 1, space2 - space1 - 1);
 
-                        ping(ip)
+                        ping(ip);
                     }
                 }
             else {
