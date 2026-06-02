@@ -200,14 +200,14 @@ int main() {
 
   sockaddr_in serverAddress;
   serverAddress.sin_family = AF_INET;
-  serverAddress.sin_port = htons(10002);
+  serverAddress.sin_port = htons(4959);
 
-  if (inet_pton(AF_INET, "95.181.173.114", &serverAddress.sin_addr) <= 0) {
+  if (inet_pton(AF_INET, "127.0.0.1", &serverAddress.sin_addr) <= 0) {
     std::cerr << "error: unavailable address" << std::endl;
     close(clientSocket);
     return 1;
   }
-  
+
   if (connect(clientSocket, (struct sockaddr *)&serverAddress,
               sizeof(serverAddress)) <= -1) {
     std::cerr << "error: connection failed!" << std::endl;
