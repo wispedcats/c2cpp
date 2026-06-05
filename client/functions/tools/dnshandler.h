@@ -1,0 +1,1 @@
+void dnsHandler(std::string &target);
